@@ -168,6 +168,8 @@ merged_data[merged_data$gross_rent == 9999, 'gross_rent'] <- NA
 # income
 
 merged_data[merged_data$total_income == 999998, 'total_income'] <- NA
+merged_data[merged_data == 999999] <- NA
+merged_data[merged_data == 9999999] <- NA
 
 # number of bedrooms
 
