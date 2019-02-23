@@ -98,6 +98,17 @@ merged_data <- full_join(merge8, merge5)
 
 count(data91) + count(data93) + count(data96) + count(data99) + count(data02) + count(data05) + count(data08) + count(data11) + count(data14) + count(data17) == count(merged_data)
 
+# Merge them all in twos (function for this?)
+
+merge01 <- full_join(data91, data93)
+merge02 <- full_join(data96, data99)
+merge03 <- full_join(merge01, merge02)
+merged_data <- full_join(data17, merge03)
+
+# check to see if all data is represented (function for this?)
+
+count(data91) + count(data93) + count(data96) + count(data99) + count(data17) == count(merged_data)
+
 ## TRUE
 
 # Decoding ----------------------------------------------------------------
@@ -121,6 +132,7 @@ merged_data[merged_data$building_condition == 8, 'building_condition'] <- NA
 
 merged_data[merged_data$sex == 1, 'sex'] <- 'male'
 merged_data[merged_data$sex == 2, 'sex'] <- 'female'
+merged_data[merged_data$sex == 8, 'sex'] <- NA
 
 # Hispanic
 
@@ -180,15 +192,4 @@ merged_data[merged_data$num_of_bedrooms == 98, 'num_of_bedrooms'] <- NA
 merged_data[merged_data == 99999] <- NA
 merged_data[merged_data == 9998] <- NA
 
-# Merge them all in twos (function for this?)
-
-merge01 <- full_join(data91, data93)
-merge02 <- full_join(data96, data99)
-merge03 <- full_join(merge01, merge02)
-merged_data <- full_join(data17, merge03)
-
-
-# check to see if all data is represented (function for this?)
-
-count(data91) + count(data93) + count(data96) + count(data99) + count(data17) == count(merged_data)
 
