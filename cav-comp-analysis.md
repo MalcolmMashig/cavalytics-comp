@@ -1,29 +1,28 @@
----
-title: "NYCHVS Data Analysis"
-author: Analyzing New York City housing data over the past three decades for the *UVA Cavalytics Spring Data Competition* and annual American Statistical Association's (ASA) <a href="https://www1.nyc.gov/site/hpd/about/nychvs-asa-data-challenge-expo.page?fbclid=IwAR0fN8TUt2UfJc3qzglI-MtMoG0WW_mky-b5Njv5yd2MdsO4Z4lp0WKiOxo#"><target = "blank">Data Challenge Expo</a>
-output:
-  github_document:
-    toc: true
-    toc_depth: 2
----
+NYCHVS Data Analysis
+================
+Analyzing New York City housing data over the past three decades for the *UVA Cavalytics Spring Data Competition* and annual American Statistical Association's (ASA) <a href="https://www1.nyc.gov/site/hpd/about/nychvs-asa-data-challenge-expo.page?fbclid=IwAR0fN8TUt2UfJc3qzglI-MtMoG0WW_mky-b5Njv5yd2MdsO4Z4lp0WKiOxo#"><target = "blank">Data Challenge Expo</a>
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
-```
+-   [Research Question](#research-question)
+-   [Hypothesis](#hypothesis)
+-   [Data Cleaning](#data-cleaning)
+-   [Major Findings](#major-findings)
 
-## Research Question
+Research Question
+-----------------
 
-The majority of housing units in NYC are renter-occupied according to this <a href="https://www.census.gov/programs-surveys/ahs/visualizations/metrobriefs-2013.html"><target = "blank">American Housing Survey</a> -- slightly over half of the city, as they found --  and so I decided to focus on renters for my research. Specifically, I am interested in how spending behavior on the essential expense of shelter has changed since the early 90's. **Are renters of NYC spending more or less relative to what they make in income?** What about those with mortgages or some sort of loan? Is there a change in spending behavior and if so, is the change consistent among renters and mortgagers, or among different demographics?
+The majority of housing units in NYC are renter-occupied according to this <a href="https://www.census.gov/programs-surveys/ahs/visualizations/metrobriefs-2013.html"><target = "blank">American Housing Survey</a> -- slightly over half of the city, as they found -- and so I decided to focus on renters for my research. Specifically, I am interested in how spending behavior on the essential expense of shelter has changed since the early 90's. **Are renters of NYC spending more or less relative to what they make in income?** What about those with mortgages or some sort of loan? Is there a change in spending behavior and if so, is the change consistent among renters and mortgagers, or among different demographics?
 
-## Hypothesis
+Hypothesis
+----------
 
-Due to record high debt levels in America, the expectation is that spending behavior on housing somewhat reflects that. That said, I foresee that residents of NYC are spending more than is comfortable to spend or more than what was reasonable for them to spend in years past. 
+Due to record high debt levels in America, the expectation is that spending behavior on housing somewhat reflects that. That said, I foresee that residents of NYC are spending more than is comfortable to spend or more than what was reasonable for them to spend in years past.
 
-## Data Cleaning
+Data Cleaning
+-------------
 
 *Feel free to skip past this to the analysis portion*
 
-```{r}
+``` r
 library(tidyverse)
 
 csv91 <- "/Users/malcolm_mashig/Downloads/NYCHVS 1991 Occupied File for ASA Challenge_CSV.csv"
@@ -102,7 +101,12 @@ merged_data <- full_join(merge8, merge5)
 # check to see if all the data is represented after merge
 
 count(data91) + count(data93) + count(data96) + count(data99) + count(data02) + count(data05) + count(data08) + count(data11) + count(data14) + count(data17) == count(merged_data)
+```
 
+    ##         n
+    ## [1,] TRUE
+
+``` r
 # Decoding ----------------------------------------------------------------
 
 # borough
@@ -183,19 +187,18 @@ merged_data[merged_data$num_of_bedrooms == 98, 'num_of_bedrooms'] <- NA
 
 merged_data[merged_data == 99999] <- NA
 merged_data[merged_data == 9998] <- NA
-
 ```
 
-## Major Findings
+Major Findings
+--------------
 
-- **Over time, renters have sacrificed non-essential rooms**
+-   **Over time, renters have sacrificed non-essential rooms**
 
 Associated Code:
 
 **NOTE** The variable `extra_rooms` is just the difference between the number of rooms in the house and the number of bedrooms in the house. They are the non-essential rooms (that residents are not sleeping in).
 
-```{r}
-
+``` r
 renters <- merged_data %>% 
   filter(mortgage == 9) %>% 
   mutate(extra_rooms = num_of_rooms - num_of_bedrooms)
@@ -205,12 +208,27 @@ extra_room_by_year <- renters %>%
   summarise(mean_extra_room = mean(extra_rooms, na.rm = TRUE))
 
 extra_room_by_year
+```
 
+    ## # A tibble: 10 x 2
+    ##    data_year mean_extra_room
+    ##        <dbl>           <dbl>
+    ##  1      1991           1.05 
+    ##  2      1993           1.00 
+    ##  3      1996           0.982
+    ##  4      1999           0.986
+    ##  5      2002           0.940
+    ##  6      2005           0.947
+    ##  7      2008           0.885
+    ##  8      2011           0.895
+    ##  9      2014           0.855
+    ## 10      2017           0.847
+
+``` r
 ggplot(extra_room_by_year, aes(data_year, mean_extra_room)) + 
   geom_point() + 
   labs(x = "Year", y = "Non-essential Rooms") +
   geom_line()
-
 ```
 
-
+![](cav-comp-analysis_files/figure-markdown_github/unnamed-chunk-2-1.png)

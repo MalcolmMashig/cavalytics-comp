@@ -88,6 +88,12 @@ renters_room_per_person <- renters %>%
   group_by(data_year) %>% 
   summarise(mean_room_per_person = mean(room_per_person, na.rm = TRUE))
 
+renters_bedroom_per_person <- renters %>% 
+  filter(total_income < 400000, gross_rent < 6000, rent < 6000) %>% 
+  mutate(income_per_rent = total_income / gross_rent) %>% 
+  group_by(data_year) %>% 
+  summarise(mean_bedroom_per_person = mean(room_per_person, na.rm = TRUE))
+
 extra_room_by_year <- merged_data %>% 
   group_by(data_year) %>% 
   summarise(mean(extra_rooms, na.rm = TRUE))
@@ -118,3 +124,17 @@ mortgagers_income <- mortgagers %>%
   summarise(mean(income_per_mortgage, na.rm = TRUE))
 
 # Mortgagers  
+
+
+
+renters <- merged_data %>% 
+  filter(mortgage == 9) %>% 
+  mutate(room_per_person = num_of_rooms / num_of_persons, 
+         bedroom_per_person = num_of_bedrooms / num_of_persons, 
+         extra_rooms = num_of_rooms - num_of_bedrooms)
+
+extra_room_by_year <- renters %>% 
+  group_by(data_year) %>% 
+  summarise(mean(extra_rooms, na.rm = TRUE), mean(room_per_person, na.rm = TRUE), mean(bedroom_per_person, na.rm = TRUE))
+
+View(extra_room_by_year)
