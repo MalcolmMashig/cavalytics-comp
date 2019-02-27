@@ -3,6 +3,8 @@
 merged_data <- merged_data %>% 
   mutate('extra_rooms' = (num_of_rooms - num_of_bedrooms))
 
+# not important
+
 extra_room_by_borough <- merged_data %>% 
   group_by(borough) %>% 
   summarise(mean(extra_rooms, na.rm = TRUE))
@@ -10,6 +12,8 @@ extra_room_by_borough <- merged_data %>%
 extra_room_by_race <- merged_data %>% 
   group_by(race) %>% 
   summarise(mean(extra_rooms, na.rm = TRUE))
+
+# Interesting
 
 extra_room_by_year <- merged_data %>% 
   group_by(data_year) %>% 
@@ -29,6 +33,8 @@ rent_by_condition <- merged_data %>%
   group_by(building_condition) %>% 
   summarise(mean(rent, na.rm = TRUE))
 
+# do this
+
 merged_data <- merged_data %>% 
   mutate(room_per_person = num_of_rooms / num_of_persons, bedroom_per_person = num_of_bedrooms / num_of_persons)
 
@@ -45,19 +51,24 @@ bedroom_ratio_by_race <- merged_data %>%
 
 ggplot(bedroom_ratio_by_race, aes(x = race, y = bedroom_ratio_by_race$`mean(bedroom_per_person, na.rm = TRUE)`)) + geom_bar(stat = 'identity')
 
+# Do next two
+
 merged_data <- merged_data %>% 
   filter(total_income < 999995)
-
-top_income <- income_by_demo %>% 
-  filter(mean_income > 90000)
 
 renters <- merged_data %>% 
   filter(mortgage == 9)
 
+top_income <- income_by_demo %>% 
+  filter(mean_income > 90000)
+
+# Interesting (accurate)
+
 count(renters) / count(merged_data)
 
-## 70 percent of the sample are renters
+## about 70 percent of the sample are renters
 
+# Analysis
 
 renters_income <- renters %>% 
   filter(total_income < 400000, gross_rent < 6000, rent < 6000) %>% 
@@ -87,7 +98,23 @@ ggplot(renters_extra_rooms, aes(x = data_year, y = mean_extra_room)) + geom_bar(
 
 # Paying more than they can afford and getting less non-essential rooms
 
-
 ggplot(renters_room_per_person, aes(x = data_year, y = mean_room_per_person)) + geom_bar(stat = 'identity')
 
 # But not sacrificing rooms per person
+
+# So not population aspect
+
+mortgagers <- merged_data %>% 
+  filter(mortgage == 'yes')
+  
+count(mortgagers) / count(merged_data)
+
+# about 17% of the data is those with mortgager (not owners or renters)
+
+mortgagers_income <- mortgagers %>%
+  filter(monthly_loan < 2599, total_income < 400000) %>% 
+  mutate(income_per_mortgage = total_income / monthly_loan) %>% 
+  group_by(data_year) %>% 
+  summarise(mean(income_per_mortgage, na.rm = TRUE))
+
+# Mortgagers  

@@ -26,6 +26,8 @@ relevant_cols_extra <- c('borough' = 'Borough', 'building_condition' = 'Conditio
 
 relevant_cols <- c('borough' = 'Borough', 'building_condition' = 'Condition of building', 'age' = "Householder's Age Recode", 'sex' = "Householder's Sex", 'race' = "Householder's Race", 'hispanic_origin' = "Householder's Hispanic Origin", "move_in_year" = 'Year Householder Moved into Unit', 'mortgage' = "Mortgage Status", 'num_of_rooms' = "Number of rooms", 'num_of_bedrooms' = "Number of bedrooms", 'rent' = "Monthly contract rent", 'num_of_persons' = "Number of Persons Recode", 'gross_rent' = "Monthly Gross Rent", 'total_income' = "Total Household Income Recode") # 15 Total
 
+relevant_cols <- c('borough' = 'Borough', 'building_condition' = 'Condition of building', 'age' = "Householder's Age Recode", 'sex' = "Householder's Sex", 'race' = "Householder's Race", 'hispanic_origin' = "Householder's Hispanic Origin", "move_in_year" = 'Year Householder Moved into Unit', 'mortgage' = "Mortgage Status", 'num_of_rooms' = "Number of rooms", 'num_of_bedrooms' = "Number of bedrooms", 'rent' = "Monthly contract rent", 'num_of_persons' = "Number of Persons Recode", 'gross_rent' = "Monthly Gross Rent", 'total_income' = "Total Household Income Recode", 'monthly_loan' = "Monthly mortgage loan payments")
+
 # Read --------------------------------------------------------------------
 
 # Read them all in with column for year variable
@@ -82,6 +84,19 @@ data17 <- read_csv(csv17, skip = 1) %>%
 
 # Merge -------------------------------------------------------------------
 
+# For mortgage calc
+
+merge1 <- full_join(data91, data93)
+merge2 <- full_join(data96, data99)
+merge3 <- full_join(data02, data05)
+merge4 <- full_join(data08, data14)
+merge6 <- full_join(merge1, merge2)
+merge7 <- full_join(merge3, merge4)
+merge8 <- full_join(merge6, merge7)
+merged_data <- merge8
+
+count(data91) + count(data93) + count(data96) + count(data99) + count(data02) + count(data05) + count(data08) + count(data14) == count(merged_data)
+
 # Merge them all in twos (function for this?)
 
 merge1 <- full_join(data91, data93)
@@ -98,7 +113,7 @@ merged_data <- full_join(merge8, merge5)
 
 count(data91) + count(data93) + count(data96) + count(data99) + count(data02) + count(data05) + count(data08) + count(data11) + count(data14) + count(data17) == count(merged_data)
 
-# Merge them all in twos (function for this?)
+# Alternate merge
 
 merge01 <- full_join(data91, data93)
 merge02 <- full_join(data96, data99)
@@ -192,4 +207,7 @@ merged_data[merged_data$num_of_bedrooms == 98, 'num_of_bedrooms'] <- NA
 merged_data[merged_data == 99999] <- NA
 merged_data[merged_data == 9998] <- NA
 
+# monthly_loan
+
+merged_data[merged_data$monthly_loan == 9999, 'monthly_loan'] <- NA
 
