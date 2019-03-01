@@ -1,6 +1,6 @@
 NYCHVS Data Analysis
 ================
-Analyzing New York City housing data over the past three decades for the *UVA Cavalytics Spring Data Competition* and annual American Statistical Association's (ASA) <a href="https://www1.nyc.gov/site/hpd/about/nychvs-asa-data-challenge-expo.page?fbclid=IwAR0fN8TUt2UfJc3qzglI-MtMoG0WW_mky-b5Njv5yd2MdsO4Z4lp0WKiOxo#"><target = "blank">Data Challenge Expo</a>
+Analyzing New York City housing data over the past three decades for the *UVA Cavalytics Spring Data Competition* and annual *American Statistical Association's* (ASA) <a href="https://www1.nyc.gov/site/hpd/about/nychvs-asa-data-challenge-expo.page?fbclid=IwAR0fN8TUt2UfJc3qzglI-MtMoG0WW_mky-b5Njv5yd2MdsO4Z4lp0WKiOxo#"><target = "blank">Data Challenge Expo</a>
 
 -   [Research Question](#research-question)
 -   [Hypothesis](#hypothesis)
@@ -192,43 +192,90 @@ merged_data[merged_data == 9998] <- NA
 Major Findings
 --------------
 
--   **Over time, renters have sacrificed non-essential rooms**
+#### **1. Over time, renters have sacrificed non-essential rooms**
 
 Associated Code:
 
-**NOTE** The variable `extra_rooms` is just the difference between the number of rooms in the house and the number of bedrooms in the house. They are the non-essential rooms (that residents are not sleeping in).
+**NOTE** The variable `extra_rooms` is just the difference between the number of rooms in the house and the number of bedrooms in the house. They are the non-essential rooms in that the residents are not sleeping in them.
 
 ``` r
-renters <- merged_data %>% 
-  filter(mortgage == 9) %>% 
+merged_data1 <- merged_data %>% 
+  filter(num_of_persons <= num_of_bedrooms) %>% 
+  mutate(extra_rooms = num_of_rooms - num_of_persons)
+
+merged_data2 <- merged_data %>% 
+  filter(num_of_persons > num_of_bedrooms) %>% 
   mutate(extra_rooms = num_of_rooms - num_of_bedrooms)
+
+merged_data <- full_join(merged_data1, merged_data2)
+
+renters <- merged_data %>% 
+  filter(mortgage == 9)
 
 extra_room_by_year <- renters %>% 
   group_by(data_year) %>% 
   summarise(mean_extra_room = mean(extra_rooms, na.rm = TRUE))
 
-extra_room_by_year
+extra_room_by_year %>% as.data.frame()
 ```
 
-    ## # A tibble: 10 x 2
     ##    data_year mean_extra_room
-    ##        <dbl>           <dbl>
-    ##  1      1991           1.05 
-    ##  2      1993           1.00 
-    ##  3      1996           0.982
-    ##  4      1999           0.986
-    ##  5      2002           0.940
-    ##  6      2005           0.947
-    ##  7      2008           0.885
-    ##  8      2011           0.895
-    ##  9      2014           0.855
-    ## 10      2017           0.847
+    ## 1       1991        1.621444
+    ## 2       1993        1.592507
+    ## 3       1996        1.569126
+    ## 4       1999        1.580761
+    ## 5       2002        1.548360
+    ## 6       2005        1.570451
+    ## 7       2008        1.520610
+    ## 8       2011        1.487477
+    ## 9       2014        1.472299
+    ## 10      2017        1.488071
 
 ``` r
 ggplot(extra_room_by_year, aes(data_year, mean_extra_room)) + 
+  labs(x = "Year", y = "Non-essential Rooms", title = "Average number of non-essential rooms for NYC renters over time") +
   geom_point() + 
-  labs(x = "Year", y = "Non-essential Rooms") +
-  geom_line()
+  geom_smooth(se = FALSE)
 ```
 
 ![](cav-comp-analysis_files/figure-markdown_github/unnamed-chunk-2-1.png)
+
+This results from the fact that, over time, the average number of rooms per person has generally decreased while the average number of bedrooms per person has generally increased.
+
+``` r
+rooms_per_person <- renters %>% 
+  mutate(room_per_person = num_of_rooms / num_of_persons, 
+         bedroom_per_person = num_of_bedrooms / num_of_persons) %>% 
+  group_by(data_year) %>% 
+  summarise(mean_room_per_person = mean(room_per_person, na.rm = TRUE),
+            mean_bedroom_per_person = mean(bedroom_per_person, na.rm = TRUE))
+
+rooms_per_person %>% as.data.frame()
+```
+
+    ##    data_year mean_room_per_person mean_bedroom_per_person
+    ## 1       1991             1.960547                1.384173
+    ## 2       1993             1.968109                1.405143
+    ## 3       1996             1.947577                1.401505
+    ## 4       1999             1.946067                1.401273
+    ## 5       2002             1.930214                1.411141
+    ## 6       2005             1.957164                1.428023
+    ## 7       2008             1.947887                1.444603
+    ## 8       2011             1.877712                1.389418
+    ## 9       2014             1.890422                1.410715
+    ## 10      2017             1.899409                1.429703
+
+This decrease in non-essential rooms for NYC renters is not exactly consistent among all boroughs. The decrease is greatest in Staten Island and Queens.
+
+``` r
+extra_room_by_year.bor <- renters %>% 
+  group_by(data_year, borough) %>% 
+  summarise(mean_extra_room = mean(extra_rooms, na.rm = TRUE))
+
+ggplot(extra_room_by_year.bor, aes(data_year, mean_extra_room, color = borough)) + 
+  labs(x = "Year", y = "Non-essential Rooms", title = "Average number of non-essential rooms for NYC renters over time (by borough)") +
+  geom_point() + 
+  geom_smooth(se = FALSE)
+```
+
+![](cav-comp-analysis_files/figure-markdown_github/unnamed-chunk-4-1.png)
