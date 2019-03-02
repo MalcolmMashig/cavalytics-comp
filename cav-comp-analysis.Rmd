@@ -13,15 +13,15 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 ## Research Question
 
-The majority of housing units in NYC are renter-occupied according to this <a href="https://www.census.gov/programs-surveys/ahs/visualizations/metrobriefs-2013.html"><target = "blank">American Housing Survey</a> -- slightly over half of the city, as they found --  and so I decided to focus on renters for my research. Specifically, I am interested in how spending behavior on the essential expense of shelter has changed since the early 90's. **Are renters of NYC spending more or less relative to what they make in income?** What about those with mortgages or some sort of loan? Is there a change in spending behavior and if so, is the change consistent among renters and mortgagers, or among different demographics?
+The majority of housing units in NYC are renter-occupied according to this <a href="https://www.census.gov/programs-surveys/ahs/visualizations/metrobriefs-2013.html"><target = "blank">American Housing Survey</a> -- slightly over half of the city, as they found --  and so I decided to focus on renters for my research. Additionally, because the data only covers three decades and rented homes are often more temporary than partially and fully-owned homes, I believe renters are more appropriate when looking for significant changes over this short time. Specifically, I am interested in how their spending behavior on the essential expense of shelter has changed since the early 90's. **Are renters of NYC spending more or less relative to what they make in income? Are they valuing physical comfort or financial comfort more?** Is there a change in spending behavior and if so, is the change consistent among renters of different demographics?
 
 ## Hypothesis
 
-Due to record high debt levels in America, the expectation is that spending behavior on housing somewhat reflects that. That said, I foresee that residents of NYC are spending more than is comfortable to spend or more than what was reasonable for them to spend in years past. 
+Due to record high debt levels in America, the expectation is that spending behavior on housing somewhat reflects that. That said, I foresee that renters of NYC are spending more than is financially comfortable for them to spend or more than what was reasonable for them to spend in years past. With a sacrifice in financial comfort, I suspect they are renting with an increased preference for physical comfort.
 
 ## Data Cleaning
 
-*Feel free to skip past this to the analysis portion*
+*Feel free to skip past this to the major findings of the analysis*
 
 ```{r}
 library(tidyverse)
@@ -192,7 +192,7 @@ merged_data[merged_data == 9998] <- NA
 
 Associated Code:
 
-**NOTE** The variable `extra_rooms` is defined as the number of rooms that are not used bedrooms. That said, it is calculated as the difference between the number of rooms and number of bedrooms or between the number of rooms and number of persons (when there are more bedrooms than people and therefore bedrooms that are not being used).
+**NOTE** The variable `extra_rooms` is defined as the number of rooms that are not used bedrooms. That said, it is calculated as the difference between the number of rooms and number of bedrooms or between the number of rooms and number of persons (when there are more bedrooms than people and therefore bedrooms that are not being used, assumably). These `extra_rooms` are those that are non-essential in that they are not serving as bedrooms for people -- which is the primary purpose of a home.
 
 ```{r}
 merged_data1 <- merged_data %>% 
@@ -204,6 +204,8 @@ merged_data2 <- merged_data %>%
   mutate(extra_rooms = num_of_rooms - num_of_bedrooms)
 
 merged_data <- full_join(merged_data1, merged_data2)
+
+count(merged_data1) + count(merged_data2) == count(merged_data)
 
 renters <- merged_data %>% 
   filter(mortgage == 9)
@@ -221,7 +223,7 @@ ggplot(extra_room_by_year, aes(data_year, mean_extra_room)) +
 
 ```
 
-This results from the fact that, over time, the average number of rooms per person has generally decreased while the average number of bedrooms per person has generally increased.
+This results somewhat from the fact that, over time, the average number of rooms per person has generally decreased while the average number of bedrooms per person has generally increased.
 
 ```{r}
 rooms_per_person <- renters %>% 
@@ -232,10 +234,10 @@ rooms_per_person <- renters %>%
             mean_bedroom_per_person = mean(bedroom_per_person, na.rm = TRUE))
 
 rooms_per_person %>% as.data.frame()
-  
+
 ```
 
-This decrease in non-essential rooms for NYC renters is not exactly consistent among all boroughs. The decrease is greatest in Staten Island and Queens.
+This decrease in non-essential rooms for NYC renters is not exactly consistent among all boroughs. The decrease is greatest in Queens.
 
 ```{r}
 extra_room_by_year.bor <- renters %>% 
@@ -243,10 +245,72 @@ extra_room_by_year.bor <- renters %>%
   summarise(mean_extra_room = mean(extra_rooms, na.rm = TRUE))
 
 ggplot(extra_room_by_year.bor, aes(data_year, mean_extra_room, color = borough)) + 
-  labs(x = "Year", y = "Non-essential Rooms", title = "Average number of non-essential rooms for NYC renters over time (by borough)") +
+  labs(x = "Year", y = "Non-essential Rooms", title = "Average number of non-essential rooms for NYC renters over time (by borough)") + 
   geom_point() + 
   geom_smooth(se = FALSE)
 ```
 
+***
 
+#### **2. Over time, renters spend a larger portion of what they make in income on rent**
+
+Associated Code:
+
+As seen below, the income-to-rent ratio has decreased since the later 90's.
+
+```{r}
+rent_ratio <- renters %>% 
+  filter(total_income < 400000, rent < 6000) %>% # remove outliers
+  mutate(income_over_rent = (total_income / 12) / rent) %>% 
+  group_by(data_year) %>% 
+  summarise(mean_income_over_rent = mean(income_over_rent, na.rm = TRUE))
+
+ggplot(rent_ratio, aes(data_year, mean_income_over_rent)) + 
+  labs(x = "Year", 
+       y = "Monthly income per dollar spent on rent", 
+       title = "NYC renters have less and less in comparision to their rent") +
+  geom_point() + 
+  geom_smooth(se = FALSE)
+
+```
+
+The increase in income hasn't quite kept pace (in terms of proportion) with the increase in rent for NYC renters.
+
+```{r}
+mean_renters <- renters %>% 
+  mutate(data_year = data_year - 1991) %>% 
+  group_by(data_year) %>% 
+  summarise(mean_income = (mean(total_income, na.rm = TRUE) / 12),
+            mean_rent = mean(rent, na.rm = TRUE))
+
+mean_renters %>% as.data.frame()
+
+lm(mean_renters$mean_income ~ mean_renters$data_year)
+lm(mean_renters$mean_rent ~ mean_renters$data_year)
+```
+
+This decrease in income dollars per dollar spent on rent seems to be fairly consistent among all boroughs. 
+
+```{r}
+rent_ratio_by_bor <- renters %>% 
+  filter(total_income < 400000, rent < 6000) %>% # remove outliers
+  mutate(income_over_rent = (total_income / 12) / rent) %>% 
+  group_by(data_year, borough) %>% 
+  summarise(mean_income_over_rent = mean(income_over_rent, na.rm = TRUE))
+
+ggplot(rent_ratio_by_bor, aes(x = data_year, 
+                              y = mean_income_over_rent, 
+                              color = borough)) + 
+  labs(x = "Year", 
+       y = "Monthly income per dollar spent on rent", 
+       title = "NYC renters in all boroughs make less and less in comparision to their rent") +
+  geom_point() + 
+  geom_smooth(se = FALSE)
+```
+
+## Further Areas to Explore
+
+- Look at demographics other than just borough location
+- Compare renters to mortgagers
+- Clean the data more thoroughly
 
