@@ -1,6 +1,6 @@
 NYCHVS Data Analysis
 ================
-Analyzing New York City housing data over the past three decades for the *UVA Cavalytics Spring Data Competition* and annual *American Statistical Association's* (ASA) <a href = "https://www1.nyc.gov/site/hpd/about/nychvs-asa-data-challenge-expo.page?fbclid=IwAR0fN8TUt2UfJc3qzglI-MtMoG0WW_mky-b5Njv5yd2MdsO4Z4lp0WKiOxo#" ><target = "blank" >Data Challenge Expo</a>
+Analyzing New York City housing data over the past three decades for the *UVA Cavalytics Spring Data Competition* and annual *American Statistical Association's* (ASA) <a href = "https://www1.nyc.gov/site/hpd/about/nychvs-asa-data-challenge-expo.page?fbclid=IwAR0fN8TUt2UfJc3qzglI-MtMoG0WW_mky-b5Njv5yd2MdsO4Z4lp0WKiOxo#">Data Challenge Expo</a>
   
 Table of Contents
 -----------------
@@ -14,7 +14,7 @@ Table of Contents
 Research Question
 -----------------
 
-The majority of housing units in NYC are renter-occupied according to this <a href="https://www.census.gov/programs-surveys/ahs/visualizations/metrobriefs-2013.html"><target = "blank">American Housing Survey</a> -- slightly over half of the city, as they found -- and so I decided to focus on renters for my research. Additionally, because the data only covers three decades and rented homes are often more temporary than partially and fully-owned homes, I believe renters are more appropriate when looking for significant changes over this short time. Specifically, I am interested in how their spending behavior on the essential expense of shelter has changed since the early 90's. **Are renters of NYC spending more or less relative to what they make in income? Are they valuing physical comfort or financial comfort more?** Is there a change in spending behavior and if so, is the change consistent among renters of different demographics?
+The majority of housing units in NYC are renter-occupied according to this <a href="https://www.census.gov/programs-surveys/ahs/visualizations/metrobriefs-2013.html">American Housing Survey</a> -- slightly over half of the city, as they found -- and so I decided to focus on renters for my research. Additionally, because the data only covers three decades and rented homes are often more temporary than partially and fully-owned homes, I believe renters are more appropriate when looking for significant changes over this short time. Specifically, I am interested in how their spending behavior on the essential expense of shelter has changed since the early 90's. **Are renters of NYC spending more or less relative to what they make in income? Are they valuing physical comfort or financial comfort more?** Is there a change in spending behavior and if so, is the change consistent among renters of different demographics?
 
 Hypothesis
 ----------
