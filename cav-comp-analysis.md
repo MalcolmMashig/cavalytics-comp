@@ -1,6 +1,9 @@
 NYCHVS Data Analysis
 ================
 Analyzing New York City housing data over the past three decades for the *UVA Cavalytics Spring Data Competition* and annual *American Statistical Association's* (ASA) <a href="https://www1.nyc.gov/site/hpd/about/nychvs-asa-data-challenge-expo.page?fbclid=IwAR0fN8TUt2UfJc3qzglI-MtMoG0WW_mky-b5Njv5yd2MdsO4Z4lp0WKiOxo#"><target = "blank">Data Challenge Expo</a>
+  
+Table of Contents
+-----------------
 
 -   [Research Question](#research-question)
 -   [Hypothesis](#hypothesis)
