@@ -192,7 +192,7 @@ merged_data[merged_data == 9998] <- NA
 
 Associated Code:
 
-**NOTE** The variable `extra_rooms` is just the difference between the number of rooms in the house and the number of bedrooms in the house. They are the non-essential rooms in that the residents are not sleeping in them.
+**NOTE** The variable `extra_rooms` is defined as the number of rooms that are not used bedrooms. That said, it is calculated as the difference between the number of rooms and number of bedrooms or between the number of rooms and number of persons (when there are more bedrooms than people and therefore bedrooms that are not being used).
 
 ```{r}
 merged_data1 <- merged_data %>% 
